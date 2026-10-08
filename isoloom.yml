@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# WordPress 4.6 PwnScriptum (Vulhub, by phith0n and the Vulhub contributors) as an Isoloom spec:
+# Vulhub's wordpress/pwnscriptum, vendored in app/: the published image
+# vulhub/wordpress:4.6 and mysql:5, with the settings of Vulhub's compose file baked in.
+# `isoloom generate`, then `isoloom run docker`.
+version: 1
+name: vulhub-wordpress-pwnscriptum
+
+networks:
+  lab: { cidr: 10.60.249.0/24, internet: false }
+
+machines:
+  mysql:
+    networks: { lab: 20 }
+    services: [{ port: 3306, name: mysql }]
+    resources: { cpus: 1, memory_mb: 512 }
+    docker:
+      build: build/mysql
+
+  web:
+    networks: { lab: 10 }
+    services: [{ port: 80, name: web, http: true, publish: 8080 }]
+    resources: { cpus: 1, memory_mb: 256 }
+    depends_on: [mysql]
+    docker:
+      build: build/web
+
+checks:
+  - name: the WordPress installer answers
+    http: http://web/wp-admin/install.php
+    wait: 240
+  - name: WordPress 4.6 is connected to its database
+    script: checks/wordpress.sh
+    wait: 120
+
+message: |
+  WordPress 4.6 answers at http://localhost:{{ machines.web.services.0.publish }}/. Finish the install with an admin user, as Vulhub's guide does.
+  Who does WordPress say a password reset mail comes from, and where does that name come from?

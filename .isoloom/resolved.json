@@ -1,0 +1,214 @@
+{
+  "generated_by_isoloom": "from isoloom.yml; don't edit: change the spec and run `isoloom generate` (`isoloom check` fails when this file is out of date)",
+  "resolved_version": 1,
+  "name": "vulhub-wordpress-pwnscriptum",
+  "instance": null,
+  "inputs": [],
+  "networks": {
+    "lab": {
+      "cidr": "10.60.249.0/24",
+      "docker_cidr": "10.60.249.0/24",
+      "internet": false,
+      "gateway": null,
+      "gateway_address": "10.60.249.1",
+      "router": null,
+      "controller": "10.60.249.253"
+    }
+  },
+  "reach": [],
+  "machines": {
+    "mysql": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.249.20"
+      },
+      "docker_addresses": {
+        "lab": "10.60.249.20"
+      },
+      "services": [
+        {
+          "port": 3306,
+          "name": "mysql",
+          "http": false,
+          "publish": null
+        }
+      ],
+      "depends_on": [],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 512,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    },
+    "web": {
+      "access": false,
+      "supplied": false,
+      "shapes": [
+        "docker"
+      ],
+      "arch": "amd64",
+      "os": null,
+      "windows": false,
+      "addresses": {
+        "lab": "10.60.249.10"
+      },
+      "docker_addresses": {
+        "lab": "10.60.249.10"
+      },
+      "services": [
+        {
+          "port": 80,
+          "name": "web",
+          "http": true,
+          "publish": 8080
+        }
+      ],
+      "depends_on": [
+        "mysql"
+      ],
+      "inputs": [],
+      "volumes": {},
+      "resources": {
+        "cpus": 1,
+        "memory_mb": 256,
+        "disk_gb": 20
+      },
+      "gateway_of": [],
+      "routes": [],
+      "default_gateway": null,
+      "offline": true
+    }
+  },
+  "start_order": [
+    "mysql",
+    "web"
+  ],
+  "clones": {},
+  "tools": {},
+  "groups": {},
+  "router": null,
+  "controller": {
+    "addresses": {
+      "lab": "10.60.249.253"
+    }
+  },
+  "published": [
+    {
+      "machine": "web",
+      "port": 80,
+      "host_port": 8080
+    }
+  ],
+  "targets": {
+    "possible": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "generated": [
+      "docker",
+      "hosted",
+      "docker-vm",
+      "cloud-docker",
+      "kubernetes"
+    ],
+    "refused": {},
+    "not_possible": {
+      "hybrid": "only when some machines are containers and others are VMs",
+      "vagrant": "needs `vm:` on mysql, web",
+      "proxmox": "needs `vm:` on mysql, web",
+      "cloud-vm": "needs `vm:` on mysql, web",
+      "external": "needs `external:` on mysql, web"
+    }
+  },
+  "checks": {
+    "default_position": "networks",
+    "positions": [
+      {
+        "position": "networks",
+        "machine": null,
+        "runner": "isoloom-check",
+        "checks": [
+          {
+            "name": "the WordPress installer answers",
+            "derived": false,
+            "kind": "http",
+            "target": "http://web/wp-admin/install.php",
+            "expect": "200",
+            "wait": 240
+          },
+          {
+            "name": "WordPress 4.6 is connected to its database",
+            "derived": false,
+            "kind": "script",
+            "target": "checks/wordpress.sh",
+            "expect": "",
+            "wait": 120
+          }
+        ]
+      },
+      {
+        "position": "mysql",
+        "machine": "mysql",
+        "runner": "isoloom-check-mysql",
+        "checks": [
+          {
+            "name": "web:80 from mysql",
+            "derived": true,
+            "kind": "http",
+            "target": "http://10.60.249.10:80/",
+            "expect": "any",
+            "wait": 30
+          },
+          {
+            "name": "no internet from mysql",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      },
+      {
+        "position": "web",
+        "machine": "web",
+        "runner": "isoloom-check-web",
+        "checks": [
+          {
+            "name": "mysql:3306 from web",
+            "derived": true,
+            "kind": "tcp",
+            "target": "10.60.249.20:3306",
+            "expect": "open",
+            "wait": 30
+          },
+          {
+            "name": "no internet from web",
+            "derived": true,
+            "kind": "http",
+            "target": "http://1.1.1.1/",
+            "expect": "blocked",
+            "wait": 0
+          }
+        ]
+      }
+    ]
+  },
+  "message": "WordPress 4.6 answers at http://localhost:8080/. Finish the install with an admin user, as Vulhub's guide does.\nWho does WordPress say a password reset mail comes from, and where does that name come from?\n"
+}
