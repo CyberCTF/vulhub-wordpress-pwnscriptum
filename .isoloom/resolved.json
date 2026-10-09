@@ -133,7 +133,8 @@
       "vagrant": "needs `vm:` on mysql, web",
       "proxmox": "needs `vm:` on mysql, web",
       "cloud-vm": "needs `vm:` on mysql, web",
-      "external": "needs `external:` on mysql, web"
+      "external": "needs `external:` on mysql, web",
+      "cloud-services": "left out by `targets:`"
     }
   },
   "checks": {

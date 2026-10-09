@@ -9,6 +9,9 @@ services:
   mysql:
     build:
       context: ../../build/mysql
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: vulhub-wordpress-pwnscriptum
     image: isoloom/vulhub-wordpress-pwnscriptum-mysql
     platform: linux/amd64
     hostname: mysql
@@ -38,6 +41,8 @@ services:
           memory: 512M
     labels:
       isoloom.service.mysql: tcp:3306
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
     restart: unless-stopped
   mysql-routes:
     image: alpine:3.20
@@ -59,9 +64,15 @@ services:
       mysql:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
   web:
     build:
       context: ../../build/web
+      labels:
+        isoloom.managed: 'true'
+        isoloom.environment: vulhub-wordpress-pwnscriptum
     image: isoloom/vulhub-wordpress-pwnscriptum-web
     platform: linux/amd64
     hostname: web
@@ -97,6 +108,8 @@ services:
           memory: 256M
     labels:
       isoloom.service.web: http:80
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
     restart: unless-stopped
   web-routes:
     image: alpine:3.20
@@ -118,6 +131,9 @@ services:
       web:
         condition: service_started
     restart: unless-stopped
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
   isoloom-check:
     image: curlimages/curl:8.11.1
     profiles:
@@ -143,6 +159,9 @@ services:
         condition: service_healthy
       web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
   isoloom-check-mysql:
     image: curlimages/curl:8.11.1
     profiles:
@@ -162,6 +181,9 @@ services:
         condition: service_healthy
       web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
   isoloom-check-web:
     image: curlimages/curl:8.11.1
     profiles:
@@ -181,6 +203,9 @@ services:
         condition: service_healthy
       web-routes:
         condition: service_healthy
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
   isoloom-probe-amd64:
     image: busybox:1.37.0-musl
     platform: linux/amd64
@@ -192,11 +217,20 @@ services:
     - isoloom-probe-amd64:/probe
     network_mode: none
     restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
 networks:
   lab:
     ipam:
       config:
       - subnet: 10.60.249.0/24
         gateway: 10.60.249.1
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
 volumes:
-  isoloom-probe-amd64: {}
+  isoloom-probe-amd64:
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: vulhub-wordpress-pwnscriptum
