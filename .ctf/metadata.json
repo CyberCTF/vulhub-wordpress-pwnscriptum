@@ -3,6 +3,6 @@
   "description": "WordPress 4.6, vulnerable to PwnScriptum (CVE-2016-10033 in PHPMailer): the password reset form builds the sender address from the Host header, which goes to the sendmail (Exim) command line, where -be string expansion runs commands.",
   "question": "Exploit PwnScriptum through the password reset form to run commands on the WordPress server and get a shell.",
   "category": "WEB",
-  "difficulty": 4,
+  "difficulty": 3,
   "evidence_kind": "SECRET"
 }
