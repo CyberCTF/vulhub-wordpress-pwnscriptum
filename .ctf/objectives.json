@@ -1,0 +1,62 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Read the flag",
+      "prompt": "Finish the WordPress install, then make the password reset mail's sender address run a command, and read /ctf/flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-vulhub-wordpress-pwnscriptum}",
+      "hints": [
+        "Finish the install with an admin user, as Vulhub's guide does. WordPress builds the sender address of a password reset mail from a request header. Read the PwnScriptum advisory (CVE-2016-10033).",
+        "The address reaches the sendmail command line of the mail transfer agent (Exim). The flag is at /ctf/flag on the web machine."
+      ],
+      "steps": [
+        {
+          "key": "version",
+          "title": "Identify the application",
+          "prompt": "Which WordPress version is installed? (version)",
+          "check": {
+            "answer_regex": "4\\.6"
+          }
+        },
+        {
+          "key": "library",
+          "title": "Find the component",
+          "prompt": "Which mail library inside WordPress is vulnerable? (name)",
+          "check": {
+            "answer": [
+              "phpmailer"
+            ]
+          }
+        },
+        {
+          "key": "header",
+          "title": "Find the input",
+          "prompt": "Which HTTP request header does WordPress use to build the sender address? (header name)",
+          "check": {
+            "answer": [
+              "host"
+            ]
+          }
+        },
+        {
+          "key": "class",
+          "title": "Name the weakness",
+          "prompt": "Which vulnerability class is this?",
+          "check": {
+            "answer": [
+              "command injection",
+              "argument injection",
+              "os command injection",
+              "shell injection",
+              "mail command injection"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

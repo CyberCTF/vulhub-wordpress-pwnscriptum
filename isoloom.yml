@@ -6,6 +6,9 @@
 version: 1
 name: vulhub-wordpress-pwnscriptum
 
+# Given by the CyberCTF launcher: this player's flag. Without it the development flag.
+inputs: [CTF_FLAG_MAIN]
+
 networks:
   lab: { cidr: 10.60.249.0/24, internet: false }
 
@@ -22,8 +25,11 @@ machines:
     services: [{ port: 80, name: web, http: true, publish: 8080 }]
     resources: { cpus: 1, memory_mb: 256 }
     depends_on: [mysql]
+    inputs: [CTF_FLAG_MAIN]
+    volumes: { ctf: /ctf }   # the flag, written by ctf/flag.sh at every start
     docker:
       build: build/web
+      init: [ctf/flag.sh]
 
 checks:
   - name: the WordPress installer answers
