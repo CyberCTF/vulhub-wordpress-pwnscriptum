@@ -7,29 +7,38 @@ version: 1
 name: vulhub-wordpress-pwnscriptum
 
 # Given by the CyberCTF launcher: this player's flag. Without it the development flag.
-inputs: [CTF_FLAG_MAIN]
+inputs:
+  CTF_FLAG_MAIN: {}
 
 networks:
-  lab: { cidr: 10.60.249.0/24, internet: false }
+  lab: {cidr: 10.60.249.0/24, internet: false}
 
 machines:
   mysql:
-    networks: { lab: 20 }
-    services: [{ port: 3306, name: mysql }]
-    resources: { cpus: 1, memory_mb: 512 }
-    docker:
+    networks: {lab: 20}
+    resources: {cpus: 1, memory_mb: 512}
+    ports:
+      mysql:
+        port: 3306
+    app:
       build: build/mysql
-
   web:
-    networks: { lab: 10 }
-    services: [{ port: 80, name: web, http: true, publish: 8080 }]
-    resources: { cpus: 1, memory_mb: 256 }
+    networks: {lab: 10}
+    resources: {cpus: 1, memory_mb: 256}
     depends_on: [mysql]
-    inputs: [CTF_FLAG_MAIN]
-    volumes: { ctf: /ctf }   # the flag, written by ctf/flag.sh at every start
-    docker:
+    volumes: {ctf: /ctf}     # the flag, written by ctf/flag.sh at every start
+    ports:
+      web:
+        port: 80
+        protocol: http
+        publish: true
+    files:
+      - path: /run/lab/ctf_flag_main
+        input: CTF_FLAG_MAIN
+    setup:
+      - ctf/flag.sh
+    app:
       build: build/web
-      init: [ctf/flag.sh]
 
 checks:
   - name: the WordPress installer answers
@@ -40,5 +49,5 @@ checks:
     wait: 120
 
 message: |
-  WordPress 4.6 answers at http://localhost:{{ machines.web.services.0.publish }}/. Finish the install with an admin user, as Vulhub's guide does.
+  WordPress 4.6 answers at {{ machines.web.ports.web.url }}. Finish the install with an admin user, as Vulhub's guide does.
   Who does WordPress say a password reset mail comes from, and where does that name come from?

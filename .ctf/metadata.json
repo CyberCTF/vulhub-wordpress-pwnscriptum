@@ -1,8 +1,11 @@
 {
+  "project_name": "cyberlabs-vulhub-wordpress-pwnscriptum",
+  "slug": "vulhub-wordpress-pwnscriptum",
   "title": "WordPress 4.6 PHPMailer Host Header RCE (PwnScriptum)",
   "description": "WordPress 4.6, vulnerable to PwnScriptum (CVE-2016-10033 in PHPMailer): the password reset form builds the sender address from the Host header, which goes to the sendmail (Exim) command line, where -be string expansion runs commands.",
-  "question": "Exploit PwnScriptum through the WordPress password reset form to run commands on the web server and read /ctf/flag.",
-  "category": "WEB",
+  "category": "web",
   "difficulty": 3,
-  "evidence_kind": "SECRET"
+  "evidence_kind": "SECRET",
+  "capabilities": [],
+  "question": "Exploit PwnScriptum through the WordPress password reset form to run commands on the web server and read /ctf/flag."
 }
